@@ -1,0 +1,23 @@
+{
+
+    "version": "0.2.0",
+    "configurations": [
+
+
+
+        {
+            "name": "restaurant",
+            "request": "launch",
+            "type": "dart",
+          
+        },
+    
+        {
+            "name": "backend",
+            "cwd": "backend",
+            "request": "launch",
+            "type": "dart",
+            "program": "bin/server.dart"
+        }
+    ]
+}

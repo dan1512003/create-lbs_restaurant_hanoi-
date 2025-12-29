@@ -1,5 +1,5 @@
-
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
 
 import 'presentation/state/provider/search_provider.dart';
@@ -14,25 +14,26 @@ import 'presentation/state/provider/user_provider.dart';
 import 'presentation/state/provider/restaurant_provider.dart';
 import 'presentation/state/provider/direction_provider.dart';
 import 'presentation/state/provider/geolocator_provider.dart';
-void main() async{
+
+void main() {
+  // ❌ Tắt toàn bộ debug log
+  debugPrint = (String? message, {int? wrapWidth}) {};
 
   runApp(
-   
-     MultiProvider(
+    MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => SearchProvider()),
-        ChangeNotifierProvider(create: (_)=>HomeProvider()),
-        ChangeNotifierProvider(create: (_) =>RestaurantTownProvider()),
-        ChangeNotifierProvider(create: (_) =>RestaurantCuisineProvider()),
-        ChangeNotifierProvider(create: (_) =>UserProvider()),
-       ChangeNotifierProvider(create: (_) =>RestaurantProvider()),
-           ChangeNotifierProvider(create: (_) =>DirectionProvider()),
-            ChangeNotifierProvider(create: (_) =>GeolocatorProvider()),
+        ChangeNotifierProvider(create: (_) => HomeProvider()),
+        ChangeNotifierProvider(create: (_) => RestaurantTownProvider()),
+        ChangeNotifierProvider(create: (_) => RestaurantCuisineProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => RestaurantProvider()),
+        ChangeNotifierProvider(create: (_) => DirectionProvider()),
+        ChangeNotifierProvider(create: (_) => GeolocatorProvider()),
       ],
       child: const MyApp(),
     ),
-    
-    );
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -45,21 +46,21 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   int _selectedIndex = 0;
 
-
   final List<Widget> _pages = const [
-    Homenavigator(),   
-  Searchnavigtor(),
-  Savenavigator(),
- Settingnavigator(),
+    Homenavigator(),
+    Searchnavigtor(),
+    Savenavigator(),
+    Settingnavigator(),
   ];
 
- @override
+  @override
   void initState() {
     super.initState();
-     WidgetsBinding.instance.addPostFrameCallback((_) {
-    context.read<UserProvider>().checkToken();
-  });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<UserProvider>().checkToken();
+    });
   }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -69,14 +70,13 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
+      debugShowCheckedModeBanner: false, 
+    
       home: Scaffold(
         body: IndexedStack(
           index: _selectedIndex,
-          children: _pages,), 
+          children: _pages,
+        ),
         bottomNavigationBar: BottomNavigationBar(
           backgroundColor: Colors.red,
           type: BottomNavigationBarType.fixed,

@@ -79,8 +79,10 @@ class SearchProvider extends ChangeNotifier {
   // FIND BY SEARCH
  
   Future<void> findbysearch(
+     TextEditingController searchController,
     MapController mapController, {
     double zoom = 15,
+    
   }) async {
     if (results.isEmpty || isLoading ==true) return;
 
@@ -99,6 +101,7 @@ isLoading=true;
       clear();
 
       if (place.category == 'boundary') {
+          searchController.text =place.displayName;
         final data =
             await _service.getrestaurantIDWARD(int.parse(place.osmId));
         final List featuresrestaurant = data['features'];
@@ -107,6 +110,7 @@ isLoading=true;
 
          final restaurantMap = await addReviewtoRestaurant( resultsrestaurnt, _service);
          resultsrestaurnt= restaurantMap.values.toList();
+          
              if(resultsrestaurnt.isEmpty){
          final dataward =await _service.getAddressFromLatLon(place.lat,place.lon);
        error="No restaurant near $dataward";
@@ -201,9 +205,20 @@ isLoading=true;
     clear();
     }
   }
-Future<void> findbymove(double  minLon,double minLat,double maxLon,double maxLat,LatLng center) async{
+Future<void> findbymove(double  minLon,
+double minLat,
+double maxLon,
+double maxLat,
+LatLng center,
+{TextEditingController? searchController}
+) async{
    if ( isLoading ==true) return;
     isLoading =true;
+    if(searchController!=null){
+searchController.text = '';
+    }
+    
+
     clear();
 try {
    
@@ -234,12 +249,22 @@ try {
     }
 }
 
-Future<void> findbyclick(double lat, double lon, MapController mapController, {
+Future<void> findbyclick(
+  double lat, 
+  double lon, 
+
+MapController mapController, {
+  TextEditingController? searchController,
     double zoom = 15,
   }) async{
     if ( isLoading ==true) return;
 try {
+
       isLoading =true;
+      if(searchController!=null){
+searchController.text = '';
+    }
+    
      clear();
 
       final dataward =await _service.getwardlatlon(lat, lon);
@@ -287,13 +312,13 @@ try {
 
 
 
-Future<void> findLocation(MapController mapController,LatLng position) async {
+Future<void> findLocation(MapController mapController,LatLng position,{TextEditingController? searchController}) async {
 
  try{
  
 location = position;
 
-findbyclick(position.latitude, position.longitude, mapController);
+findbyclick(position.latitude, position.longitude, mapController,searchController: searchController);
  }catch(e){
 
    print('Lỗi findbylocation: $e');

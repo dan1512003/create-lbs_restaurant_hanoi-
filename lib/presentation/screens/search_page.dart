@@ -105,7 +105,7 @@ return  Stack(
               flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
               ),
               onTap: (tapPosition, point) {
-             provider.findbyclick(point.latitude, point.longitude,_mapController);
+             provider.findbyclick(point.latitude, point.longitude,_mapController,searchController: _searchController);
 },
    onPositionChanged: (MapCamera position, bool hasGesture) {
   final bounds = position.visibleBounds;
@@ -117,7 +117,7 @@ return  Stack(
   final maxLon = ne.longitude;  
   final maxLat = ne.latitude;   
 
-           provider.findbymove(minLon, minLat, maxLon, maxLat,position.center);
+           provider.findbymove(minLon, minLat, maxLon, maxLat,position.center,searchController: _searchController);
           },
 
             ),
@@ -246,7 +246,7 @@ if (provider.location != null)
     final LatLng? location =
         await geo.getCurrentLocation();
 if(location!=null){
-      await provider.findLocation(_mapController,location);
+      await provider.findLocation(_mapController,location,searchController: _searchController);
 }
    
   },
@@ -362,7 +362,7 @@ if(location!=null){
 
 onSubmitted: (value) {
           if (value.isNotEmpty) {
-            provider.findbysearch(_mapController);
+            provider.findbysearch(_searchController,_mapController);
           } else {
             provider.clear();
           }

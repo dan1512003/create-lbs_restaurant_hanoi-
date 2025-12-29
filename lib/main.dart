@@ -17,7 +17,7 @@ import 'presentation/state/provider/geolocator_provider.dart';
 
 void main() {
 
-  debugPrint = (String? message, {int? wrapWidth}) {};
+
 
   runApp(
     MultiProvider(

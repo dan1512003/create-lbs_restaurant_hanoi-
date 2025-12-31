@@ -3,14 +3,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import '../../../data/services/search_service.dart';
+import 'package:restaurant/data/repositories/search_repository.dart';
+
+
 import '../../../data/model/restaurant.dart';
 import '../../../data/model/ward.dart';
 import '../../../core/constants/restaurant_utils.dart';
 import '../../../data/model/nominatimplace.dart';
 
 class SearchProvider extends ChangeNotifier {
-  final SearchService _service = SearchService();
+
+
+  final  SearchRepository  repository;
+
+  SearchProvider({required this.repository});
+
 
   List<NominatimPlace> results = [];
   List<Restaurant> resultsrestaurnt = [];
@@ -23,9 +30,9 @@ class SearchProvider extends ChangeNotifier {
 
 
     try {
-      final datanominatimplace = await _service.searchPlace(query);
-      final datarestaurant = await _service.getrestaurant();
-      final dataward = await _service.getward();
+      final datanominatimplace = await repository.searchPlace(query);
+      final datarestaurant = await repository.getrestaurant();
+      final dataward = await repository.getward();
 
       final List featuresnominatimplace = datanominatimplace['features'];
       final List featuresrestaurant = datarestaurant['features'];
@@ -103,16 +110,16 @@ isLoading=true;
       if (place.category == 'boundary') {
           searchController.text =place.displayName;
         final data =
-            await _service.getrestaurantIDWARD(int.parse(place.osmId));
+            await repository.getrestaurantIDWARD(int.parse(place.osmId));
         final List featuresrestaurant = data['features'];
 
         resultsrestaurnt = featuresrestaurant.map((f) => Restaurant.fromFeature(f)).toList();
 
-         final restaurantMap = await addReviewtoRestaurant( resultsrestaurnt, _service);
+         final restaurantMap = await addReviewtoRestaurant( resultsrestaurnt, repository);
          resultsrestaurnt= restaurantMap.values.toList();
           
              if(resultsrestaurnt.isEmpty){
-         final dataward =await _service.getAddressFromLatLon(place.lat,place.lon);
+         final dataward =await repository.getAddressFromLatLon(place.lat,place.lon);
        error="No restaurant near $dataward";
        isLoading =false;
       notifyListeners();
@@ -121,12 +128,12 @@ isLoading=true;
       } else {
         for (final amenity in amenityPlaces) {
           final data =
-              await _service.getrestaurantID(int.parse(amenity.osmId));
+              await repository.getrestaurantID(int.parse(amenity.osmId));
           final List featuresrestaurant = data['features'];
 
           resultsrestaurnt.addAll(featuresrestaurant.map((f) => Restaurant.fromFeature(f)));
         }
-         final restaurantMap = await addReviewtoRestaurant( resultsrestaurnt, _service);
+         final restaurantMap = await addReviewtoRestaurant( resultsrestaurnt, repository);
          resultsrestaurnt= restaurantMap.values.toList();
       }
 
@@ -166,17 +173,17 @@ isLoading=true;
 
       if (nominatimplace.category == 'boundary') {
         final data =
-            await _service.getrestaurantIDWARD(int.parse(nominatimplace.osmId));
+            await repository.getrestaurantIDWARD(int.parse(nominatimplace.osmId));
         final List featuresrestaurant = data['features'];
 
         resultsrestaurnt =
             featuresrestaurant.map((f) => Restaurant.fromFeature(f)).toList();
 
-             final restaurantMap = await addReviewtoRestaurant( resultsrestaurnt, _service);
+             final restaurantMap = await addReviewtoRestaurant( resultsrestaurnt, repository);
          resultsrestaurnt= restaurantMap.values.toList();
 
             if(resultsrestaurnt.isEmpty){
-         final dataward =await _service.getAddressFromLatLon(nominatimplace.lat, nominatimplace.lon);
+         final dataward =await repository.getAddressFromLatLon(nominatimplace.lat, nominatimplace.lon);
        error="No restaurant near $dataward";
        isLoading =false;
       notifyListeners();
@@ -185,12 +192,12 @@ isLoading=true;
      
       } else {
         final data =
-            await _service.getrestaurantID(int.parse(nominatimplace.osmId));
+            await repository.getrestaurantID(int.parse(nominatimplace.osmId));
         final List featuresrestaurant = data['features'];
 
         resultsrestaurnt =
             featuresrestaurant.map((f) => Restaurant.fromFeature(f)).toList();
-             final restaurantMap = await addReviewtoRestaurant( resultsrestaurnt, _service);
+             final restaurantMap = await addReviewtoRestaurant( resultsrestaurnt, repository);
          resultsrestaurnt= restaurantMap.values.toList();
       }
   mapController.move(
@@ -223,16 +230,16 @@ searchController.text = '';
 try {
    
    final data =
-            await _service.getrestaurantbound(minLon, minLat, maxLon, maxLat);
+            await repository.getrestaurantbound(minLon, minLat, maxLon, maxLat);
         final List featuresrestaurant = data['features'];
 
         resultsrestaurnt =
             featuresrestaurant.map((f) => Restaurant.fromFeature(f)).toList();
-             final restaurantMap = await addReviewtoRestaurant( resultsrestaurnt, _service);
+             final restaurantMap = await addReviewtoRestaurant( resultsrestaurnt, repository);
          resultsrestaurnt= restaurantMap.values.toList();
            print("số luộng nhà hàng khi move :${resultsrestaurnt.length}");
          if(resultsrestaurnt.isEmpty){
-         final dataward =await _service.getAddressFromLatLon(center.latitude, center.longitude);
+         final dataward =await repository.getAddressFromLatLon(center.latitude, center.longitude);
        error="No restaurant near $dataward";
        isLoading =false;
       notifyListeners();
@@ -267,14 +274,14 @@ searchController.text = '';
     
      clear();
 
-      final dataward =await _service.getwardlatlon(lat, lon);
+      final dataward =await repository.getwardlatlon(lat, lon);
 
     if (dataward['features']==null) {
        mapController.move(
       LatLng(lat, lon),
       zoom,
     );
-    final dataward =await _service.getAddressFromLatLon(lat, lon);
+    final dataward =await repository.getAddressFromLatLon(lat, lon);
        error="No restaurant near $dataward";
        isLoading =false;
       notifyListeners();
@@ -286,14 +293,14 @@ searchController.text = '';
           .map<Ward>((f) => Ward.fromMap(f['properties']))
           .toList();
       final place =listward.first;
-      final data =   await _service.getrestaurantIDWARD(int.parse(place.osmId));
+      final data =   await repository.getrestaurantIDWARD(int.parse(place.osmId));
       final List featuresrestaurant = data['features'];
 
         resultsrestaurnt =
             featuresrestaurant.map((f) => Restaurant.fromFeature(f)).toList();
 
        
-               final restaurantMap = await addReviewtoRestaurant( resultsrestaurnt, _service);
+               final restaurantMap = await addReviewtoRestaurant( resultsrestaurnt, repository);
          resultsrestaurnt= restaurantMap.values.toList();
      print("số luộng nhà hàng khi click1 :${resultsrestaurnt.length}");
  

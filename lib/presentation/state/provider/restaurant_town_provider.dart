@@ -5,14 +5,18 @@ import 'package:intl/intl.dart';
 import 'package:restaurant/data/model/diet.dart';
 import 'package:restaurant/data/model/restaurant.dart';
 import 'package:restaurant/data/model/review.dart';
+import 'package:restaurant/data/repositories/search_repository.dart';
 import '../../../core/constants/restaurant_utils.dart';
-import '../../../data/services/search_service.dart';
+
 
 
 
 
 class RestaurantTownProvider extends ChangeNotifier {
-  final SearchService _service = SearchService();
+  final  SearchRepository  repository;
+
+  RestaurantTownProvider({required this.repository});
+  
 
   List<Restaurant> restaurantavail= [];
   List<Restaurant> restauranthightrate= [];
@@ -35,7 +39,7 @@ try {
     'Sun': 'Su',
   };
   String dayAbbr = dayMap[DateFormat('EEE').format(now)]!;
-      final datarestaurant = await _service.getrestaurantIDWARD(int.parse(osmId));
+      final datarestaurant = await repository.getrestaurantIDWARD(int.parse(osmId));
      final List featuresrestaurant = datarestaurant['features'];
 
          List<Restaurant>  restaurant = featuresrestaurant.map((f) => Restaurant.fromFeature(f)).toList();
@@ -49,7 +53,7 @@ continue;
       restaurantavail.add(r);
     }
       }
-final restaurantMap = await addReviewtoRestaurant(restaurantavail, _service);
+final restaurantMap = await addReviewtoRestaurant(restaurantavail, repository);
 restaurantavail= restaurantMap.values.toList();
   
   }
@@ -66,12 +70,12 @@ restaurantavail= restaurantMap.values.toList();
      Future<void> restaurantCuisine(String osmId ) async {
         
 try {
-   List datadiet= await _service.getdiet();
+   List datadiet= await repository.getdiet();
    List<Diet> diet =datadiet.map((d)=>Diet.fromJson(d)).toList();
    Map<String, Diet> dietMap = {
     for (var d in diet) d.diet.toLowerCase(): d
   };
-    final datarestaurant = await _service.getrestaurantIDWARD(int.parse(osmId));
+    final datarestaurant = await repository.getrestaurantIDWARD(int.parse(osmId));
      final List featuresrestaurant = datarestaurant['features'];
       List<Restaurant>  restaurant = featuresrestaurant.map((f) => Restaurant.fromFeature(f)).toList();
     for (var r in restaurant) {
@@ -104,10 +108,10 @@ try {
  Future<void> restaurantHightRate(String osmId ) async {
         
 try {
-   List datareview= await _service.getreview();
+   List datareview= await repository.getreview();
    List<Review> review =datareview.map((d)=>Review.fromJson(d)).toList();
 
-    final datarestaurant = await _service.getrestaurantIDWARD(int.parse(osmId));
+    final datarestaurant = await repository.getrestaurantIDWARD(int.parse(osmId));
     final List featuresrestaurant = datarestaurant['features'];
     List<Restaurant>  restaurantward = featuresrestaurant.map((f) => Restaurant.fromFeature(f)).toList();
    
@@ -143,7 +147,7 @@ for (var r in restauranthightrate) {
   r.reviewCount = 0;
 }
 
- restaurantMap = await addReviewtoRestaurant(restauranthightrate, _service);
+ restaurantMap = await addReviewtoRestaurant(restauranthightrate, repository);
 restauranthightrate= restaurantMap.values.toList();
   
 
@@ -162,7 +166,7 @@ restauranthightrate= restaurantMap.values.toList();
         
 try {
   
-    final datarestaurant = await _service.getrestaurantIDWARD(int.parse(osmId));
+    final datarestaurant = await repository.getrestaurantIDWARD(int.parse(osmId));
     final List featuresrestaurant = datarestaurant['features'];
     List<Restaurant>  restaurantward = featuresrestaurant.map((f) => Restaurant.fromFeature(f)).toList();
    
@@ -170,7 +174,7 @@ try {
     .where((r) => r.starttime != null && isDateInCurrentMonth(r.starttime!))
     .toList();
 
- final restaurantMap = await addReviewtoRestaurant(restaurantnew, _service);
+ final restaurantMap = await addReviewtoRestaurant(restaurantnew, repository);
  restaurantnew= restaurantMap.values.toList();
 
     notifyListeners();

@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart'; 
 import 'dart:io';
+
+import 'package:restaurant/data/repositories/search_repository.dart';
   String getBackendUrl() {
   if (kIsWeb) {
     return 'http://localhost:3030';
@@ -11,11 +13,12 @@ import 'dart:io';
     return 'http://localhost:3030';
   }
 }
-class SearchService {
+class SearchService implements  SearchRepository   {
   static const String baseUrl =
       'https://nominatim.openstreetmap.org/search';
 
   final _headers = {'Content-Type': 'application/json'};
+  @override
   Future<Map<String, dynamic>> searchPlace(String query) async {
     final uri = Uri.parse(baseUrl).replace(queryParameters: {
       'q': query,
@@ -35,6 +38,7 @@ class SearchService {
     }
   }
 
+  @override
   Future<String> getAddressFromLatLon(double lat, double lon) async {
   // Tạo URL reverse
   final uri = Uri.https(
@@ -67,7 +71,8 @@ class SearchService {
   }
 }
 //Kết nối api restauratn
-   Future<Map<String, dynamic>> getrestaurant() async {
+   @override
+  Future<Map<String, dynamic>> getrestaurant() async {
   final apirestaurantUrl ='${getBackendUrl()}/api/restaurant';
 
   final response = await http.get(Uri.parse(apirestaurantUrl));
@@ -82,7 +87,8 @@ class SearchService {
   }
 
 
-     Future<Map<String, dynamic>> getrestaurantID(int id) async {
+     @override
+  Future<Map<String, dynamic>> getrestaurantID(int id) async {
   final apirestaurantUrl = '${getBackendUrl()}/api/restaurantid?osm_id=$id';
 
   final response = await http.get(Uri.parse(apirestaurantUrl));
@@ -96,7 +102,8 @@ class SearchService {
     }
   }
 
-     Future<Map<String, dynamic>> getrestaurantIDWARD(int id) async {
+     @override
+  Future<Map<String, dynamic>> getrestaurantIDWARD(int id) async {
   final apirestaurantUrl = '${getBackendUrl()}/api/restaurant?osm_id=$id';
 
   final response = await http.get(Uri.parse(apirestaurantUrl));
@@ -111,7 +118,8 @@ class SearchService {
   }
 
 
-     Future<Map<String, dynamic>> getrestaurantbound(
+     @override
+  Future<Map<String, dynamic>> getrestaurantbound(
 
        double minLon,
        double minLat,
@@ -145,6 +153,7 @@ class SearchService {
 
 
 //Kết nối api ward
+  @override
   Future<Map<String, dynamic>> getward() async {
   final apiwardUrl ='${getBackendUrl()}/api/ward';
 
@@ -158,6 +167,7 @@ class SearchService {
       throw Exception('Ward API error');
     }
   }
+  @override
   Future<Map<String, dynamic>> getwardID(int id) async {
   final apiwardUrl ='${getBackendUrl()}/api/ward?osm_id=$id';
 
@@ -171,6 +181,7 @@ class SearchService {
       throw Exception('Ward API error');
     }
   }
+  @override
   Future<Map<String, dynamic>> getwardlatlon(double lat,double  lon) async {
 
 final apiwardUrl = '${getBackendUrl()}/api/wardlatlon?lat=$lat&lon=$lon';
@@ -188,6 +199,7 @@ final apiwardUrl = '${getBackendUrl()}/api/wardlatlon?lat=$lat&lon=$lon';
 
   }
 //Kêt nối api diet
+  @override
   Future<List<dynamic>> getdiet() async {
   final apiwardUrl ='${getBackendUrl()}/api/diet';
 
@@ -203,7 +215,8 @@ final apiwardUrl = '${getBackendUrl()}/api/wardlatlon?lat=$lat&lon=$lon';
   }
 
   //Kết nối api review
-    Future<List<dynamic>> getreview() async {
+    @override
+  Future<List<dynamic>> getreview() async {
   final apiwardUrl ='${getBackendUrl()}/api/review';
 
   final response = await http.get(Uri.parse(apiwardUrl));
@@ -217,7 +230,8 @@ final apiwardUrl = '${getBackendUrl()}/api/wardlatlon?lat=$lat&lon=$lon';
     }
   }
 
-Future<Map<String, dynamic>> addReview({
+@override
+  Future<Map<String, dynamic>> addReview({
   required int rateFood,
    required int rateService,
    required  int rateAmbience,
@@ -255,7 +269,8 @@ Future<Map<String, dynamic>> addReview({
 
 
 
-     Future< List<dynamic>> getreviewID(int id) async {
+     @override
+  Future< List<dynamic>> getreviewID(int id) async {
   final apireviewUrl = '${getBackendUrl()}/api/review?osm_id=$id';
 
   final response = await http.get(Uri.parse(apireviewUrl));
@@ -268,7 +283,8 @@ Future<Map<String, dynamic>> addReview({
     }
   }
 
- Future<List<dynamic>> getReviewEmail(String email) async {
+ @override
+  Future<List<dynamic>> getReviewEmail(String email) async {
   final apiwardUrl ='${getBackendUrl()}/api/reviewemail?email=$email';
 
   final response = await http.get(Uri.parse(apiwardUrl));
@@ -281,7 +297,8 @@ Future<Map<String, dynamic>> addReview({
     }
   }
 
-   Future<List<dynamic>> getReviewEmailID(String email,int osmId) async {
+   @override
+  Future<List<dynamic>> getReviewEmailID(String email,int osmId) async {
   final apiwardUrl ='${getBackendUrl()}/api/reviewemail?email=$email&osm_id=$osmId';
 
   final response = await http.get(Uri.parse(apiwardUrl));
@@ -295,6 +312,7 @@ Future<Map<String, dynamic>> addReview({
   }
 
 
+  @override
   Future<Map<String, dynamic>> editReview({
    required int rateFood,
    required int rateService,
@@ -332,6 +350,7 @@ Future<Map<String, dynamic>> addReview({
 }
 
 //kêt nối api user
+  @override
   Future<List<dynamic>> checkPhone(String phone) async {
   final url = Uri.parse('${getBackendUrl()}/api/checkphone');
 
@@ -354,6 +373,7 @@ Future<Map<String, dynamic>> addReview({
   }
 }
 
+  @override
   Future< Map<String, dynamic>> checkEmail({String phone="",required String email}) async {
   final url = Uri.parse('${getBackendUrl()}/api/checkmail');
 
@@ -379,6 +399,7 @@ Future<Map<String, dynamic>> addReview({
   }
 }
 
+  @override
   Future< Map<String, dynamic>> checkToken(String token) async {
   final url = Uri.parse('${getBackendUrl()}/api/checktoken');
   try {
@@ -402,6 +423,7 @@ Future<Map<String, dynamic>> addReview({
 }
 
 
+  @override
   Future< Map<String, dynamic>> saveUser(
     String email,
     String phone,
@@ -434,6 +456,7 @@ Future<Map<String, dynamic>> addReview({
   }
 }
 
+  @override
   Future< Map<String, dynamic>> editUser(
     String email,
     String phone,
@@ -465,7 +488,8 @@ Future<Map<String, dynamic>> addReview({
   }
 }
 
-   Future< List<dynamic>> getUser(String email) async {
+   @override
+  Future< List<dynamic>> getUser(String email) async {
   final apireviewUrl = '${getBackendUrl()}/api/getuser?email=$email';
 
   final response = await http.get(Uri.parse(apireviewUrl));

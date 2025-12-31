@@ -3,16 +3,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-
+import 'package:restaurant/data/repositories/search_repository.dart';
 import 'package:restaurant/data/services/routing_service.dart';
-import '../../../data/services/search_service.dart';
+
+
 import '../../../data/model/restaurant.dart';
 import '../../../core/constants/restaurant_utils.dart';
 import '../../../data/model/nominatimplace.dart';
 
 class DirectionProvider extends ChangeNotifier {
-  final SearchService _service = SearchService();
-  final RoutingService _routingService=RoutingService();
+
+   final  SearchRepository  repositoryservice;
+   final RoutingRepository routingrepository;
+
+
+  DirectionProvider({required this.repositoryservice,required this.routingrepository});
+ 
+  
+
+
+
   List<NominatimPlace> results = [];
   RouteResult? routeResult;
    Restaurant? resultsrestaurnt ;
@@ -25,7 +35,7 @@ class DirectionProvider extends ChangeNotifier {
 
 
     Future<void> getRoute(LatLng start, LatLng end) async {     
-      routeResult = await _routingService.getRoute(start, end);
+      routeResult = await routingrepository.getRoute(start, end);
  if(routeResult==null){
   print("rỗng");
  }else{
@@ -47,8 +57,8 @@ void updateCurrentLocation(LatLng pos) {
 
 
     try {
-      final datanominatimplace = await _service.searchPlace(query);
-      final datarestaurant = await _service.getrestaurant();
+      final datanominatimplace = await repositoryservice.searchPlace(query);
+      final datarestaurant = await repositoryservice.getrestaurant();
   
 
       final List featuresnominatimplace = datanominatimplace['features'];
@@ -108,12 +118,12 @@ isLoading=true;
     try {
       List<Restaurant> restaurantdata=[];
      for (final amenity in results) {
-          final data = await _service.getrestaurantID(int.parse(amenity.osmId));
+          final data = await repositoryservice.getrestaurantID(int.parse(amenity.osmId));
           final List featuresrestaurant = data['features'];
 
          restaurantdata.addAll(featuresrestaurant.map((f) => Restaurant.fromFeature(f)));
         }
-         final restaurantMap = await addReviewtoRestaurant( restaurantdata, _service);
+         final restaurantMap = await addReviewtoRestaurant( restaurantdata, repositoryservice);
          resultsrestaurnt= restaurantMap.values.toList().first;
       await getRoute(currentLocation!, LatLng(resultsrestaurnt!.lat, resultsrestaurnt!.lon) );
 
@@ -150,11 +160,11 @@ isLoading=true;
     try {
     
      List<Restaurant> restaurantdata=[];
-    final data = await _service.getrestaurantID(int.parse(nominatimplace.osmId));
+    final data = await repositoryservice.getrestaurantID(int.parse(nominatimplace.osmId));
         final List featuresrestaurant = data['features'];
 
        restaurantdata =featuresrestaurant.map((f) => Restaurant.fromFeature(f)).toList();
-       final restaurantMap = await addReviewtoRestaurant( restaurantdata, _service);
+       final restaurantMap = await addReviewtoRestaurant( restaurantdata, repositoryservice);
          resultsrestaurnt= restaurantMap.values.toList().first;
          await getRoute(currentLocation!, LatLng(nominatimplace.lat, nominatimplace.lon) );
   mapController.move(

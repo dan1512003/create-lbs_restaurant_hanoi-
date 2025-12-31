@@ -11,6 +11,7 @@ class Settingnavigator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Navigator(
+      key:Key('setting_page'),
       onGenerateRoute: (settings) {
         return MaterialPageRoute(
           settings: settings,

@@ -1,19 +1,27 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter/material.dart';
+import 'package:restaurant/data/repositories/localstore_repository.dart';
+import 'package:restaurant/data/repositories/search_repository.dart';
 
 
 
 import '../../../data/model/user.dart';
-import '../../../data/services/search_service.dart';
-import '../../../data/services/localstore_service.dart';
+
+
 
 
 
 
 class UserProvider extends ChangeNotifier {
-  final SearchService _pgservice = SearchService();
-  final LocalstoreService _localstoreService =LocalstoreService();
+
+    final  SearchRepository  repositoryservice;
+   final LocalstoreRepository  localstoreservice;
+
+
+  UserProvider({required this.repositoryservice,required this.localstoreservice});
+
+
   String token ="";
    User? user;
   String phone ="";
@@ -21,14 +29,14 @@ class UserProvider extends ChangeNotifier {
  Future<void> checkToken() async {
     
 try {
-   String? token = await _localstoreService.getToken();
+   String? token = await localstoreservice.getToken();
   if(token == null)return;
-   final data =await _pgservice.checkToken(token);
+   final data =await repositoryservice.checkToken(token);
 if(data.isNotEmpty){
   user = User.fromJson(data);
   this.token = token;
 }else{
-  await _localstoreService.deleteToken();
+  await localstoreservice.deleteToken();
 }
  notifyListeners();
 
@@ -45,7 +53,7 @@ if(data.isNotEmpty){
     
 try {
  
-final data =await _pgservice.checkPhone(phone);
+final data =await repositoryservice.checkPhone(phone);
 if(data.isEmpty)return;
  this.phone = data[0]['phone'] as String;
  
@@ -63,15 +71,15 @@ if(data.isEmpty)return;
     
 try {
 print("phone $phone");
-final data =await _pgservice.checkEmail(email: email,phone: phone) ;
+final data =await repositoryservice.checkEmail(email: email,phone: phone) ;
 if(data.isEmpty)return;
 final token = data['token'] as String? ?? '';
 
 if (token.isNotEmpty) {
-final datatoken =await _pgservice.checkToken(token);
+final datatoken =await repositoryservice.checkToken(token);
 if(datatoken.isNotEmpty){
   user = User.fromJson(datatoken);
-  await _localstoreService.saveToken(token);
+  await localstoreservice.saveToken(token);
  this.token=token;
   print('Token: $token');
 
@@ -99,15 +107,15 @@ if(datatoken.isNotEmpty){
     
 try {
  
-final data =await _pgservice.saveUser(email, phone, lastname, firstname) ;
+final data =await repositoryservice.saveUser(email, phone, lastname, firstname) ;
 if(data.isEmpty)return ;
 final token = data['token'] as String? ?? '';
 
 if (token.isNotEmpty) {
-final datatoken =await _pgservice.checkToken(token);
+final datatoken =await repositoryservice.checkToken(token);
 if(datatoken.isNotEmpty){
   user = User.fromJson(datatoken);
-  await _localstoreService.saveToken(token);
+  await localstoreservice.saveToken(token);
   this.token=token;
   print('Token: $token');
 }
@@ -128,7 +136,7 @@ notifyListeners();
   
 Future<void> editUser(String phone, String email, String lastname, String firstname,String oldemail) async {
   try {
-    final data = await _pgservice.editUser(email, phone, lastname, firstname,oldemail);
+    final data = await repositoryservice.editUser(email, phone, lastname, firstname,oldemail);
     
     //Kiểm tra xem có lỗi từ backend
     if (data.containsKey('error')) {
@@ -145,11 +153,11 @@ Future<void> editUser(String phone, String email, String lastname, String firstn
     final token = data['token'] as String? ?? '';
 
     if (token.isNotEmpty) {
-      final datatoken = await _pgservice.checkToken(token);
+      final datatoken = await repositoryservice.checkToken(token);
       if (datatoken.isNotEmpty) {
         user = User.fromJson(datatoken);
-        await _localstoreService.deleteToken();
-        await _localstoreService.saveToken(token);
+        await localstoreservice.deleteToken();
+        await localstoreservice.saveToken(token);
         this.token = token;
         print('Token: $token');
       }
@@ -168,7 +176,7 @@ Future<void> editUser(String phone, String email, String lastname, String firstn
 
 Future<void> signout() async {
   try {
-  await _localstoreService.deleteToken();
+  await localstoreservice.deleteToken();
   token ="";
     notifyListeners();
   } catch (e) {

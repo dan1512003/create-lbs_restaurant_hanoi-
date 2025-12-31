@@ -2,10 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:restaurant/data/model/restaurant.dart';
+import 'package:restaurant/data/repositories/search_repository.dart';
 import '../../../core/constants/restaurant_utils.dart';
 
 
-import '../../../data/services/search_service.dart';
+
 
 
 
@@ -13,7 +14,10 @@ import '../../../data/services/search_service.dart';
 
 
 class RestaurantCuisineProvider extends ChangeNotifier {
-  final SearchService _service = SearchService();
+  final  SearchRepository  repository;
+
+  RestaurantCuisineProvider({required this.repository});
+
 
  List<Restaurant> restaurantcuisine= [];
   
@@ -23,7 +27,7 @@ class RestaurantCuisineProvider extends ChangeNotifier {
     
 try {
      restaurantcuisine= [];
-    final datarestaurant = await _service.getrestaurantIDWARD(int.parse(osmId));
+    final datarestaurant = await repository.getrestaurantIDWARD(int.parse(osmId));
      final List featuresrestaurant = datarestaurant['features'];
       List<Restaurant>  restaurant = featuresrestaurant.map((f) => Restaurant.fromFeature(f)).toList();
     for (var r in restaurant) {
@@ -33,7 +37,7 @@ try {
     restaurantcuisine.add(r);
   } 
 
-   final restaurantMap = await addReviewtoRestaurant(restaurantcuisine, _service);
+   final restaurantMap = await addReviewtoRestaurant(restaurantcuisine, repository);
 restaurantcuisine= restaurantMap.values.toList();
   }
     notifyListeners();
@@ -51,7 +55,7 @@ restaurantcuisine= restaurantMap.values.toList();
         
 try {
      restaurantcuisine= [];
-    final datarestaurant = await _service.getrestaurant();
+    final datarestaurant = await repository.getrestaurant();
      final List featuresrestaurant = datarestaurant['features'];
       List<Restaurant>  restaurant = featuresrestaurant.map((f) => Restaurant.fromFeature(f)).toList();
     for (var r in restaurant) {
@@ -61,7 +65,7 @@ try {
     restaurantcuisine.add(r);
   } 
 
-   final restaurantMap = await addReviewtoRestaurant(restaurantcuisine, _service);
+   final restaurantMap = await addReviewtoRestaurant(restaurantcuisine, repository);
 restaurantcuisine= restaurantMap.values.toList();
   }
     notifyListeners();

@@ -29,9 +29,7 @@ class User {
     };
   }
 
-  /// =======================
-  /// NAME HELPERS (NO PARAMS)
-  /// =======================
+ 
 
   String get firstName {
     if (name == null || name!.trim().isEmpty) return '';

@@ -6,6 +6,7 @@ class Homenavigator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Navigator(
+      key: Key('home_page'),
       onGenerateRoute: (settings) {
    
 

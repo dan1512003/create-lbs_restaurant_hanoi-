@@ -1,7 +1,8 @@
 import 'package:intl/intl.dart';
 import 'package:restaurant/data/model/restaurant.dart';
 import 'package:restaurant/data/model/review.dart';
-import 'package:restaurant/data/services/search_service.dart';
+import 'package:restaurant/data/repositories/search_repository.dart';
+
 
 bool checkSchedule(String schedule, String currentDay, DateTime now) {
   Map<String, int> dayOrder = {
@@ -80,8 +81,8 @@ bool isDateInCurrentMonth(String dateStr) {
 }
 
 
-Future<Map<String, Restaurant>> addReviewtoRestaurant( List<Restaurant> restaurant,SearchService service )async{
-   List datareview= await service.getreview();
+Future<Map<String, Restaurant>> addReviewtoRestaurant( List<Restaurant> restaurant,SearchRepository  repository)async{
+   List datareview= await repository.getreview();
    List<Review> review =datareview.map((d)=>Review.fromJson(d)).toList();
 
 

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
+import 'package:restaurant/data/services/localstore_service.dart';
+import 'package:restaurant/data/services/routing_service.dart';
+import 'package:restaurant/data/services/search_service.dart';
 
 import 'presentation/state/provider/search_provider.dart';
 import 'presentation/screens/homenavigator.dart';
@@ -16,19 +19,20 @@ import 'presentation/state/provider/direction_provider.dart';
 import 'presentation/state/provider/geolocator_provider.dart';
 
 void main() {
-
-
+ final searchService = SearchService();
+  final routingService = RoutingService(); 
+  final localstoreService = LocalstoreService();
 
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => SearchProvider()),
-        ChangeNotifierProvider(create: (_) => HomeProvider()),
-        ChangeNotifierProvider(create: (_) => RestaurantTownProvider()),
-        ChangeNotifierProvider(create: (_) => RestaurantCuisineProvider()),
-        ChangeNotifierProvider(create: (_) => UserProvider()),
-        ChangeNotifierProvider(create: (_) => RestaurantProvider()),
-        ChangeNotifierProvider(create: (_) => DirectionProvider()),
+        ChangeNotifierProvider(create: (_) => SearchProvider(repository: searchService)),
+        ChangeNotifierProvider(create: (_) => HomeProvider(repository: searchService)),
+        ChangeNotifierProvider(create: (_) => RestaurantTownProvider(repository: searchService)),
+        ChangeNotifierProvider(create: (_) => RestaurantCuisineProvider(repository: searchService)),
+        ChangeNotifierProvider(create: (_) => UserProvider(repositoryservice: searchService,localstoreservice: localstoreService)),
+        ChangeNotifierProvider(create: (_) => RestaurantProvider(repository: searchService)),
+        ChangeNotifierProvider(create: (_) => DirectionProvider(repositoryservice: searchService,routingrepository: routingService)),
         ChangeNotifierProvider(create: (_) => GeolocatorProvider()),
       ],
       child: const MyApp(),

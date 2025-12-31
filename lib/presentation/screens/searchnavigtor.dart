@@ -7,6 +7,7 @@ class Searchnavigtor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Navigator(
+      key:Key('search_page'),
       onGenerateRoute: (settings) {
         
 

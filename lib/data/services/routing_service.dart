@@ -4,10 +4,16 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
  
-class RoutingService {
+ // Abstract repository
+abstract class RoutingRepository {
+  /// Lấy tuyến đường giữa hai điểm
+  Future<RouteResult?> getRoute(LatLng start, LatLng end);
+}
+class RoutingService implements RoutingRepository {
   static const String _osrmBaseUrl = 'https://router.project-osrm.org';
  
   // Tính toán tuyến đường giữa hai điểm
+  @override
   Future<RouteResult?> getRoute(LatLng start, LatLng end) async {
     try {
       final url = Uri.parse(

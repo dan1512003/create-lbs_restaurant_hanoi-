@@ -3,14 +3,18 @@
 import 'package:flutter/material.dart';
 import 'package:restaurant/data/model/review.dart';
 import 'package:restaurant/data/model/user.dart';
-import '../../../data/services/search_service.dart';
+import 'package:restaurant/data/repositories/search_repository.dart';
+
 
 
 
 
 
 class RestaurantProvider extends ChangeNotifier {
-  final SearchService _pgservice = SearchService();
+  final  SearchRepository  repository;
+
+  RestaurantProvider({required this.repository});
+  
  Map<int, int> starCount = {
   1: 0,
   2: 0,
@@ -23,7 +27,7 @@ List<Review> command=[];
  Future<String> getAddress(double lat, double lon) async {
     
 try {
-   return await _pgservice.getAddressFromLatLon(lat, lon);
+   return await repository.getAddressFromLatLon(lat, lon);
  
     } catch (e) {
       print('Lỗi getAddress(: $e');
@@ -35,7 +39,7 @@ try {
   Future<User?> getUser(String email) async {
     
 try {
-  final datauser =await _pgservice.getUser(email);
+  final datauser =await repository.getUser(email);
   final data =datauser.first as Map<String,dynamic>;
    return User.fromJson(data);
  
@@ -58,7 +62,7 @@ try {
   4: 0,
   5: 0,
 };
- final datareview = await _pgservice.getreviewID(int.parse(osmId));
+ final datareview = await repository.getreviewID(int.parse(osmId));
     
  review = datareview
           .map<Review>((f) => Review.fromJson(f))
@@ -91,7 +95,7 @@ try {
     
 try {
  
- final datareview = await _pgservice.getReviewEmail(email);
+ final datareview = await repository.getReviewEmail(email);
     
 return review = datareview
           .map<Review>((f) => Review.fromJson(f))
@@ -110,7 +114,7 @@ Future<List<Review>> getReviewEmailID(String email,String osmId) async {
     
 try {
  
- final datareview = await _pgservice.getReviewEmailID(email, int.parse(osmId));
+ final datareview = await repository.getReviewEmailID(email, int.parse(osmId));
     
 return review = datareview
           .map<Review>((f) => Review.fromJson(f))
@@ -140,7 +144,7 @@ Future<void> addReview(
     
 try {
  
- await _pgservice.addReview(
+ await repository.addReview(
   idRestaurant: idRestaurant, 
   email: email, 
   date: date,
@@ -179,7 +183,7 @@ Future<void> editReview(
     
 try {
  
- await _pgservice.editReview(
+ await repository.editReview(
   idRestaurant: idRestaurant, 
   email: email, 
   date: date,
